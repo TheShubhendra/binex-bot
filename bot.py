@@ -144,7 +144,7 @@ def main():
      updater.start_polling()
   else:
     updater.start_webhook(listen='0.0.0.0',port=int(PORT),url_path=TOKEN)
-    uodater.bot.setWebhook(APP_URL+TOKEN)
+    updater.bot.setWebhook(APP_URL+TOKEN)
   updater.idle()
   
 if __name__=='__main__':
