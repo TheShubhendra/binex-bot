@@ -74,7 +74,7 @@ def show_ques(update, context):
   challenge_id = query.data
   questions = fetch_database(f"SELECT * FROM problems WHERE challenge_id={challenge_id}")
   keyboard =[]
-  for pid,name,code,stmt,cid in questions:
+  for pid,name,code,stmt,cid,link in questions:
     keyboard.append([InlineKeyboardButton(name,callback_data=code)])
   keyboard.append([InlineKeyboardButton("Back",callback_data="back")])
   reply_markup = InlineKeyboardMarkup(keyboard)
