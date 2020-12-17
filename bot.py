@@ -134,7 +134,8 @@ def main():
   #  SELECTOR:CallbackQueryHandler(callback)
       SUBMIT:[MessageHandler(Filters.text&(~Filters.command), submitted)]
       },
-    fallbacks=[CommandHandler("cancel", cancel)]
+    fallbacks=[CommandHandler("cancel", cancel)],
+    allow_reentry=True
     )
     
     
