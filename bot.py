@@ -26,7 +26,7 @@ DATABASE_URL=config ("DATABASE_URL")
 
 CON = psycopg2.connect(DATABASE_URL)
 CURS = CON.cursor()
-
+CHOOSED_QUES={}
 ##Logging##
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
@@ -43,6 +43,7 @@ def fetch_database(q):
   CURS.execute(q)
   print(q)
   return CURS.fetchall()
+  
 def start(update,context):
   update.message.reply_text(f"""
 Hello {update.message.from_user.first_name }!!
@@ -64,7 +65,6 @@ def show_challenges(update,context):
     update.callback_query.answer()
     update.callback_query.edit_message_text("List of all challenges",reply_markup=reply_markup)
   return SELECTOR
-  
 
 
 def show_ques(update, context):
@@ -85,11 +85,9 @@ def submit_code(update, context):
   print("submit_code")
   query = update.callback_query
   prob_code = query.data
+  CHOOSED_QUES[query.from_user.id] = prob_code
   query.edit_message_text("Please Send the solution of Problem: "+prob_code)
   return SUBMIT
-def show_problem(update,context):
-  
-  update.reply_text()
   
 def submitted(update,context):
   print("Submitting")
@@ -99,12 +97,14 @@ def submitted(update,context):
   name = user.first_name+" "+user.last_name
   time = datetime.datetime.now()
   username=user.username
+  prob_code=CHOOSED_QUES[user_id]
+  prob_link,prob_name=fetch_database(f"SELECT problem_link,problem_name from problems WHERE problem_code='{prob_code}'")[0]
+  print(prob_link)
   try:
-    
     insert_query("INSERT INTO solution")
   except:
     pass
-  text = "Solution by: "+mention_markdown(int(user_id),name)+"\n"+solution
+  text = f"Solution by: {mention_markdown(int(user_id),name)}\nProblem: [{prob_name}]({prob_link})\n{solution}"
   update.message.reply_text("Your code has been submitted",)
   context.bot.sendMessage(ADMIN_CHAT_ID,text=text,parse_mode="Markdown")
   return ConversationHandler.END
