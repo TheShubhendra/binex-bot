@@ -86,7 +86,8 @@ def submit_code(update, context):
   query = update.callback_query
   prob_code = query.data
   CHOOSED_QUES[query.from_user.id] = prob_code
-  query.edit_message_text("Please Send the solution of Problem: "+prob_code)
+  prob_name = fetch_database(f"SELECT problem_name from problems WHERE problem_code='{prob_code}'")
+  query.edit_message_text(f"Please Send the solution of Problem: {prob_name} ({prob_code})")
   return SUBMIT
   
 def submitted(update,context):
