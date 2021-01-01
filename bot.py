@@ -106,7 +106,7 @@ def submitted(update,context):
     pass
   text = f"Solution by: {mention_markdown(int(user_id),name)}\nProblem: [{prob_name}]({prob_link})\n{solution}"
   update.message.reply_text("Your code has been submitted",)
-  context.bot.sendMessage(ADMIN_CHAT_ID,text=text,parse_mode="Markdown")
+  context.bot.sendMessage(ADMIN_CHAT_ID,text=text,parse_mode="Markdown",disable_web_page_preview=True)
   return ConversationHandler.END
   
 
@@ -118,13 +118,23 @@ def cancel (update,context):
     )
 
     return ConversationHandler.END
-
+def deep_link(update, context):
+  text = update.message.text.split()
+  if len(text)==1:
+    start(update,context)
+  else:
+    prob_code = text[1]
+    update.message.reply_text("Please Send the solution of Problem: "+prob_code)
+    CHOOSED_QUES[update.message.from_user.id] = prob_code
+    return SUBMIT
 def main():
   updater = Updater(TOKEN)
   dispatcher = updater.dispatcher
   
   solution_handler = ConversationHandler(
-    entry_points=[CommandHandler("submit_code",show_challenges)],
+    entry_points=[CommandHandler("submit_code",show_challenges),
+      CommandHandler("start",deep_link)
+],
     states={
     SELECTOR:[
     CallbackQueryHandler(show_ques,pattern="^[0-9]+$"),
@@ -139,7 +149,6 @@ def main():
     )
     
     
-  dispatcher.add_handler(CommandHandler("start",start))
   dispatcher.add_handler(solution_handler)
   if len(sys.argv)>1 and sys.argv[1]=="-p":
      updater.start_polling()
